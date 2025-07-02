@@ -255,8 +255,8 @@ export function UserDashboard() {
               <CardContent className="text-center py-12">
                 <BookOpen className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No borrowed books</h3>
-                <p className="text-muted-foreground mb-4">You haven't borrowed any books yet.</p>
-                <Button onClick={() => document.querySelector('[value="browse"]')?.click()}>Browse Books</Button>
+                <p className="text-muted-foreground mb-4">You have not borrowed any books yet.</p>
+                <Button onClick={() => (document.querySelector('[value="browse"]') as HTMLElement | null)?.click()}>Browse Books</Button>
               </CardContent>
             </Card>
           ) : (

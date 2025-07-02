@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import type { Book, User } from "@/lib/models";
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -32,7 +32,6 @@ import {
   CheckCircle,
   Bell,
 } from "lucide-react"
-import type { Book } from "@/lib/models"
 import { NotificationPanel } from "./notification-panel"
 import { AnalyticsCharts } from "./analytics-charts"
 
@@ -50,11 +49,50 @@ export function AdminDashboard() {
     description: "",
     totalCopies: "",
   })
-  const [overdueBooks, setOverdueBooks] = useState([])
+  interface OverdueRecord {
+    _id: string;
+    book: Book;
+    user: User;
+    daysOverdue: number;
+    borrowDate: string;
+    dueDate: string;
+  }
+  const [overdueBooks, setOverdueBooks] = useState<OverdueRecord[]>([])
 
   const categories = ["Fiction", "Non-Fiction", "Science", "Technology", "History", "Biography", "Mystery", "Romance"]
 
   useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        setLoading(true)
+        const params = new URLSearchParams()
+        if (searchTerm) params.append("search", searchTerm)
+        if (selectedCategory !== "all") params.append("category", selectedCategory)
+
+        const response = await fetch(`/api/books?${params}`)
+        if (response.ok) {
+          const data = await response.json()
+          setBooks(data)
+        }
+      } catch (error) {
+        console.error("Error fetching books:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const fetchOverdueBooks = async () => {
+      try {
+        const response = await fetch('/api/admin/overdue-books')
+        if (response.ok) {
+          const data = await response.json()
+          setOverdueBooks(data)
+        }
+      } catch (error) {
+        console.error("Error fetching overdue books:", error)
+      }
+    }
+
     fetchBooks()
     fetchOverdueBooks()
   }, [searchTerm, selectedCategory])
